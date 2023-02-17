@@ -1,0 +1,12 @@
+INFLUXDB:
+    host: ${INFLUXDB IP}
+    port: ${INFLUXDB Port}
+    user : ${INFLUXDB USER}
+    password : ${INFLUXDB PASSWORD}
+    db : ${INFLUXDB_DB}
+
+CHECK_LTE_ANALYSYS_RATE:
+    use_yn: use
+    query1: SELECT EVENT_TIME, VEND_ID, ALL_CNT FROM analyzing_rate_check where EVENT_TIME = $EVENT_TIME
+    query2: SELECT EVENT_TIME_TAG, VEND_ID, ASR_EXIST_ENB, CSL_EXIST_ENB, RRC_EXIST_ENB FROM type_cnt_by_enb where EVENT_TIME_TAG = $EVENT_TIME
+    sms_receiver: ${xxxxxxxxxxx}, ${xxxxxxxxxxx}
