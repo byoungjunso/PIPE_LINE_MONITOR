@@ -15,7 +15,7 @@ import logging
 from logging.handlers import RotatingFileHandler
 pd.set_option('display.max_columns', 14)
 
-app_dir = "/home/tangosvc/op_platform/spark_monitor"
+app_dir = "${APP_DIR}"
 tmp_dir = app_dir + "/sincedb"
 log_dir = app_dir + "/logs"
 log_file = log_dir + "/spark_strm_monitor.log"
@@ -50,8 +50,8 @@ def default_setup(directory, file):
 default_setup(target_directory, lt_file)
 
 #"haState":"ACTIVE"
-rm1_host = 'http://100.100.105.101:8088'
-rm2_host = 'http://100.100.105.102:8088'
+rm1_host = 'http://${RESOURCE_MANAGER1_IP:PORT}'
+rm2_host = 'http://${RESOURCE_MANAGER2_IP:PORT}'
 
 
 
