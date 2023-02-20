@@ -1,0 +1,66 @@
+input {
+    beats {
+        port => ${수신 포트}
+    }
+}
+filter {
+   mutate {
+       replace => {"host" => "%{[host][name]}"}
+   }
+   csv {
+       separator => "|"
+       columns => ["EVENT_TIME","VEND_ID","DATA_TYPE","LAST_DIGIT","FILE_NAME","FILE_SIZE","FILE_LINE"]
+       }
+   date {
+        match => ["EVENT_TIME", "YYYYMMddHHmmssSSS"]
+        target => "@timestamp"
+       }
+   dissect { mapping => { "VEND_ID" => "%{VEND_ID}_%{GEN}" } }
+   dissect { mapping => { "FILE_NAME" =>  "%{DATA_HOST}_%{RAW_DATA_SOURCE}-%{DATA_TIME}_%{DATA_ENB_LAST_DIGIT}_%{DATA_SOURCE_KEY}.%{DATA_EXT}" } }
+   if [RAW_DATA_SOURCE] == "SOURCE_1" {
+           mutate {
+                   add_field => {"DATA_SOURCE" => "S1"}
+           }
+   } else if [RAW_DATA_SOURCE] == "SOURCE_2" {
+           mutate {
+                   add_field => {"DATA_SOURCE" => "S2"}
+           }
+   } else if [RAW_DATA_SOURCE] == "SOURCE_3" {
+           mutate {
+                   add_field => {"DATA_SOURCE" => "S3"}
+           }
+   } else if [RAW_DATA_SOURCE] == "SOURCE_4" {
+           mutate {
+                   add_field => {"DATA_SOURCE" => "S4"}
+           }
+   } else if [RAW_DATA_SOURCE] == "SOURCE_5" {
+           mutate {
+                   add_field => {"DATA_SOURCE" => "S5"}
+           }
+   }
+
+   mutate {
+        remove_field => ["tags", "log", "ecs", "agent", "input", "LOG_LEVEL", "LOGCLASS", "message", "DATA_EXT", "DATA_TIME", "LAST_DIGIT", "DATA_TYPE", "RAW_DATA_SOURCE"]
+   }
+   mutate {
+        add_field => {"DATA_TYPE" => "${데이터 타입}"}
+   }
+}
+output {
+#    stdout {
+#        codec => "rubydebug"
+#    }
+    influxdb {
+        host => "${INFLUXDB_HOST}"
+        port => "${INFLUXDB_PORT}"
+        db => "${DB_NM}"
+        allow_time_override => "true"
+        use_event_fields_for_data_points => "true"
+        coerce_values => {
+            "FILE_SIZE" => "integer"
+            "FILE_LINE" => "integer"
+        }
+        measurement => "${MEASUREMENT_NM}"
+        send_as_tags => ["host","DATA_TYPE","DATA_SOURCE", "GEN", "DATA_SOURCE_KEY"]
+    }
+}
