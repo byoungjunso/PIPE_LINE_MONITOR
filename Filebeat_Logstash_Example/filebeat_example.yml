@@ -1,0 +1,17 @@
+filebeat:
+    inputs:
+      - type: log
+        enabled: true
+        paths: ${모니터링 할 파일 Full Path}
+        tail_files: true
+        filebeat.config.modules:
+        ignore_older: 10m
+
+    processors:
+      - add_host_metadata: ~
+
+#----------------------------- Logstash output ---------------------------------
+output.logstash:
+    hosts: ["${전송할 Logstash Host:Port}"]
+    bulk_max_size: 1024
+
